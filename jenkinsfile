@@ -1,0 +1,66 @@
+@Library('shared') _
+
+pipeline {
+
+    agent {
+        label 'vinod'
+    }
+
+    stages {
+
+        stage('Hello from Shared Library') {
+            steps {
+                hello()
+            }
+        }
+
+        stage('Clone Repository') {
+            steps {
+                lone(
+                    'https://github.com/LondheShubham153/django-notes-app.git',
+                    'main'
+                )
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                docker_build(
+                    'notes-app',
+                    'latest',
+                    'ashifkhan04'
+                )
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                docker_push(
+                    'notes-app',
+                    'latest'
+                )
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                docker_deploy()
+            }
+        }
+    }
+
+    post {
+
+        always {
+            echo "Pipeline execution completed."
+        }
+
+        success {
+            echo "Application deployed successfully."
+        }
+
+        failure {
+            echo "Pipeline failed."
+        }
+    }
+}
